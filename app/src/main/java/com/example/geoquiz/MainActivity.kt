@@ -6,6 +6,8 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
+import java.lang.Integer.max
 
 private const val TAG = "MainActivity"
 
@@ -14,6 +16,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var buttonTrue: Button
     private lateinit var buttonFalse: Button
     private lateinit var buttonNext: Button
+    private lateinit var buttonBack: Button
     private lateinit var label: TextView
     private lateinit var counter: TextView
 
@@ -26,7 +29,7 @@ class MainActivity : AppCompatActivity() {
         Question(R.string.question_asia, true))
 
     private var questionNumber = 0
-    private var isAnswered = false
+    private var isAnswered = 0
     private var rightAnswers = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,10 +37,10 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "onCreate(Bundle?) called")
 
         setContentView(R.layout.activity_main)
-
         buttonTrue = findViewById<Button>(R.id.button_true)
         buttonFalse = findViewById<Button>(R.id.button_false)
         buttonNext = findViewById<Button>(R.id.button_next)
+        buttonBack = findViewById<Button>(R.id.button_back)
         updateButtons()
 
         label = findViewById<TextView>(R.id.label)
@@ -45,12 +48,12 @@ class MainActivity : AppCompatActivity() {
         updateQuestion()
 
         buttonTrue.setOnClickListener {
-            isAnswered = true
+            isAnswered ++
             checkAnswer(true)
             updateButtons()
         }
         buttonFalse.setOnClickListener {
-            isAnswered = true
+            isAnswered ++
             checkAnswer(false)
             updateButtons()
         }
@@ -62,8 +65,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        buttonBack.setOnClickListener {
+                prevQuestion()
+        }
+
         label.setOnClickListener {
-            if (isAnswered){
+            if (isAnswered > questionNumber){
                 nextQuestion()
             }
         }
@@ -73,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
         outState.putInt("questionNumber", questionNumber)
         outState.putInt("rightAnswers", rightAnswers)
-        outState.putBoolean("isAnswered", isAnswered)
+        outState.putInt("isAnswered", isAnswered)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -84,14 +91,21 @@ class MainActivity : AppCompatActivity() {
 
         rightAnswers = savedInstanceState.getInt("rightAnswers")
 
-        isAnswered = savedInstanceState.getBoolean("isAnswered")
+        isAnswered = savedInstanceState.getInt("isAnswered")
         updateButtons()
     }
 
     private fun nextQuestion() {
         questionNumber = (questionNumber + 1) % questionBank.size
         updateQuestion()
-        isAnswered = false
+//        isAnswered = false
+        updateButtons()
+    }
+
+    private fun prevQuestion() {
+        questionNumber = max(0, (questionNumber - 1) % questionBank.size)
+        updateQuestion()
+//        isAnswered = true
         updateButtons()
 
     }
@@ -123,11 +137,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateButtons(){
-        setButtonVisibility(buttonTrue, !isAnswered)
-        setButtonVisibility(buttonFalse, !isAnswered)
-        setButtonVisibility(buttonNext, isAnswered)
+        setButtonVisibility(buttonTrue, isAnswered <= questionNumber)
+        setButtonVisibility(buttonFalse, isAnswered  <= questionNumber)
+        setButtonVisibility(buttonNext, isAnswered  > questionNumber)
         if ( questionNumber + 1 == questionBank.size){
             buttonNext.setText(R.string.button_finish)
+        } else {
+            buttonNext.setText(R.string.button_next)
         }
     }
 }
