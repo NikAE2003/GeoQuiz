@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import java.lang.Integer.max
 
@@ -19,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var buttonBack: Button
     private lateinit var label: TextView
     private lateinit var counter: TextView
+    private lateinit var viewModel: QuizViewModel
 
     private val questionBank = listOf(
         Question(R.string.question_australia, true),
@@ -37,6 +39,21 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "onCreate(Bundle?) called")
 
         setContentView(R.layout.activity_main)
+
+        viewModel = ViewModelProvider(this).get(QuizViewModel::class.java)
+        viewModel.questionNumber.observe(this, Observer{
+            questionNumber = it
+        })
+        viewModel.isAnswered.observe(this, Observer{
+            isAnswered = it
+        })
+        viewModel.rightAnswers.observe(this, Observer{
+            rightAnswers = it
+        })
+        questionNumber = viewModel.questionNumber.value!!
+        isAnswered = viewModel.isAnswered.value!!
+        rightAnswers = viewModel.rightAnswers.value!!
+
         buttonTrue = findViewById<Button>(R.id.button_true)
         buttonFalse = findViewById<Button>(R.id.button_false)
         buttonNext = findViewById<Button>(R.id.button_next)
@@ -48,12 +65,14 @@ class MainActivity : AppCompatActivity() {
         updateQuestion()
 
         buttonTrue.setOnClickListener {
-            isAnswered ++
+            viewModel.isAnswered.value = viewModel.isAnswered.value!! + 1
+//            isAnswered ++
             checkAnswer(true)
             updateButtons()
         }
         buttonFalse.setOnClickListener {
-            isAnswered ++
+            viewModel.isAnswered.value = viewModel.isAnswered.value!! + 1
+//            isAnswered ++
             checkAnswer(false)
             updateButtons()
         }
@@ -76,34 +95,36 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putInt("questionNumber", questionNumber)
-        outState.putInt("rightAnswers", rightAnswers)
-        outState.putInt("isAnswered", isAnswered)
-    }
+//    override fun onSaveInstanceState(outState: Bundle) {
+//        super.onSaveInstanceState(outState)
+//        outState.putInt("questionNumber", questionNumber)
+//        outState.putInt("rightAnswers", rightAnswers)
+//        outState.putInt("isAnswered", isAnswered)
+//    }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        questionNumber = savedInstanceState.getInt("questionNumber")
-        Log.d(TAG, "onRestoreInstanceState $questionNumber")
-        updateQuestion()
-
-        rightAnswers = savedInstanceState.getInt("rightAnswers")
-
-        isAnswered = savedInstanceState.getInt("isAnswered")
-        updateButtons()
-    }
+//    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+//        super.onRestoreInstanceState(savedInstanceState)
+//        questionNumber = savedInstanceState.getInt("questionNumber")
+//        Log.d(TAG, "onRestoreInstanceState $questionNumber")
+//        updateQuestion()
+//
+//        rightAnswers = savedInstanceState.getInt("rightAnswers")
+//
+//        isAnswered = savedInstanceState.getInt("isAnswered")
+//        updateButtons()
+//    }
 
     private fun nextQuestion() {
-        questionNumber = (questionNumber + 1) % questionBank.size
+        viewModel.questionNumber.value = (viewModel.questionNumber.value!! + 1) % questionBank.size
+//        questionNumber = (questionNumber + 1) % questionBank.size
         updateQuestion()
 //        isAnswered = false
         updateButtons()
     }
 
     private fun prevQuestion() {
-        questionNumber = max(0, (questionNumber - 1) % questionBank.size)
+        viewModel.questionNumber.value = max(0, (viewModel.questionNumber.value!! - 1)) % questionBank.size
+//        questionNumber = max(0, (questionNumber - 1) % questionBank.size)
         updateQuestion()
 //        isAnswered = true
         updateButtons()
@@ -120,7 +141,8 @@ class MainActivity : AppCompatActivity() {
         val messageResId: Int
         if (userAnswer == questionBank[questionNumber].answer){
             messageResId = R.string.correct_toast
-            rightAnswers ++
+            viewModel.rightAnswers.value = viewModel.rightAnswers.value!! + 1
+//            rightAnswers ++
         } else{
             messageResId = R.string.incorrect_toast
         }
