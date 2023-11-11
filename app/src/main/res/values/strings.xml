@@ -5,6 +5,7 @@
     <string name="button_false">Ложь</string>
     <string name="button_next">Далее</string>
     <string name="button_finish">Результаты</string>
+    <string name="button_help">Подсказка</string>
     <string name="question_oceans">The Pacific Ocean is larger than the Atlantic Ocean.</string>
     <string name="question_mideast">The Suez Canal connects the Red Sea and the Indian Ocean.</string>
     <string name="question_africa">The source of the Nile River is in Egypt.</string>
@@ -12,4 +13,6 @@
     <string name="question_asia">Lake Baikal is the world\'s oldest and deepest freshwater lake.</string>
     <string name="correct_toast">Верно 😁</string>
     <string name="incorrect_toast">Неверно 😢</string>
+    <string name="warning">Вы уверены?</string>
+    <string name="cheat_is_wrong">Жульничать плохо</string>
 </resources>
