@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import java.lang.Integer.max
 
 private const val TAG = "MainActivity"
+private const val REQUEST_CODE_CHEAT = 0
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,8 +31,13 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        viewModel = ViewModelProvider(this).get(QuizViewModel::class.java)
+        viewModel = ViewModelProvider(this)[QuizViewModel::class.java]
 
+        findViews()
+        setListeners()
+    }
+
+    private fun findViews(){
         buttonTrue = findViewById<Button>(R.id.button_true)
         buttonFalse = findViewById<Button>(R.id.button_false)
         buttonNext = findViewById<Button>(R.id.button_next)
@@ -42,7 +48,9 @@ class MainActivity : AppCompatActivity() {
         label = findViewById<TextView>(R.id.label)
         counter = findViewById<TextView>(R.id.counter)
         updateQuestion()
+    }
 
+    private fun setListeners(){
         buttonTrue.setOnClickListener {
             checkAnswer(true)
             updateButtons()
@@ -60,12 +68,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonBack.setOnClickListener {
-                prevQuestion()
+            prevQuestion()
         }
 
         buttonHelp.setOnClickListener {
-            val intent = Intent(this, HelpActivity::class.java)
-            startActivity(intent)
+            val intent = HelpActivity.newIntent(this, viewModel.currentAnswer)
+            startActivityForResult(intent, REQUEST_CODE_CHEAT)
         }
 
         label.setOnClickListener {
