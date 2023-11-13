@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -16,6 +17,7 @@ class HelpActivity : AppCompatActivity() {
 
     private lateinit var button: Button
     private lateinit var text: TextView
+    private lateinit var versionText: TextView
     private var answer: Boolean = false
 
     @SuppressLint("MissingInflatedId")
@@ -27,6 +29,9 @@ class HelpActivity : AppCompatActivity() {
 
         button = findViewById<Button>(R.id.button_help)
         text = findViewById<TextView>(R.id.textView)
+        versionText = findViewById<TextView>(R.id.textView_version)
+
+        versionText.setText("API Level ${Build.VERSION.SDK_INT}")
 
         button.setOnClickListener {
             showAnswer()
