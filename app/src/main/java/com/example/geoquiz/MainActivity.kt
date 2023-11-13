@@ -1,5 +1,6 @@
 package com.example.geoquiz
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -13,6 +14,7 @@ import java.lang.Integer.max
 
 private const val TAG = "MainActivity"
 private const val REQUEST_CODE_CHEAT = 0
+private const val EXTRA_ANSWER_SHOWN = "com.example.geoquiz.answer_is_shown"
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,6 +37,21 @@ class MainActivity : AppCompatActivity() {
 
         findViews()
         setListeners()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode != Activity.RESULT_OK){
+            return
+        }
+
+        if (requestCode == REQUEST_CODE_CHEAT){
+            val answerShown = data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false)
+            if (answerShown!!){
+                viewModel.helpCount ++
+            }
+        }
     }
 
     private fun findViews(){
@@ -72,8 +89,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonHelp.setOnClickListener {
-            val intent = HelpActivity.newIntent(this, viewModel.currentAnswer)
-            startActivityForResult(intent, REQUEST_CODE_CHEAT)
+            if (viewModel.helpCount >= 3){
+                Toast.makeText(this, R.string.cheat_is_wrong, Toast.LENGTH_SHORT).show()
+            } else{
+                val intent = HelpActivity.newIntent(this, viewModel.currentAnswer)
+                startActivityForResult(intent, REQUEST_CODE_CHEAT)
+            }
         }
 
         label.setOnClickListener {

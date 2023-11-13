@@ -17,6 +17,8 @@ class QuizViewModel: ViewModel() {
     var rightAnswers = 0
         private set
 
+    var helpCount = 0
+
     private val questionBank = listOf(
         Question(R.string.question_australia, true),
         Question(R.string.question_oceans, true),
